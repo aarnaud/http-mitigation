@@ -65,9 +65,8 @@ func defaultHandler(w http.ResponseWriter, r *http.Request) {
 func challengeHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	// If challenge request, check validity
-	uri := db.Client.Get(vars["challenge"]).Val()
-	log.Warn(uri)
-	if uri != "" {
+	url := db.Client.Get(vars["challenge"]).Val()
+	if url != "" {
 		expires := time.Now().Add(time.Minute)
 
 		// Generate JWT token
@@ -90,7 +89,7 @@ func challengeHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		http.SetCookie(w, cookie)
 		log.Debugf("Challenge resolved")
-		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+		http.Redirect(w, r, url, http.StatusTemporaryRedirect)
 		return
 	}
 
@@ -99,7 +98,9 @@ func challengeHandler(w http.ResponseWriter, r *http.Request) {
 
 
 func getChallenge(w http.ResponseWriter, r *http.Request){
+	var url string
 	uri := r.Header.Get("X-Original-URI")
+	query := r.Header.Get("X-Original-Query")
 	token, err := uuid.NewRandom()
 	if err != nil {
 		log.Error(err)
@@ -107,7 +108,12 @@ func getChallenge(w http.ResponseWriter, r *http.Request){
 		return
 	}
 	// Client has 2 second to resolve the challenge
-	db.Client.Set(token.String(), uri, 2*time.Second)
+	if query != "" {
+		url = fmt.Sprintf("%s%s", uri, query)
+	} else {
+		url = uri
+	}
+	db.Client.Set(token.String(), url, 2*time.Second)
 	w.Header().Add("X-challenge", fmt.Sprintf("/__protection/%s", token.String()))
 	w.WriteHeader(200)
 }
