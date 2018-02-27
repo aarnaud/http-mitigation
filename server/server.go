@@ -65,7 +65,7 @@ func defaultHandler(w http.ResponseWriter, r *http.Request) {
 func challengeHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	// If challenge request, check validity
-	url := db.Client.Get(vars["challenge"]).Val()
+	url := db.Client.Get(fmt.Sprintf("challenge:%s", vars["challenge"])).Val()
 	if url != "" {
 		expires := time.Now().Add(time.Minute)
 
@@ -113,7 +113,7 @@ func getChallenge(w http.ResponseWriter, r *http.Request){
 	} else {
 		url = uri
 	}
-	db.Client.Set(token.String(), url, 2*time.Second)
+	db.Client.Set(fmt.Sprintf("challenge:%s", token.String()), url, 2*time.Second)
 	w.Header().Add("X-challenge", fmt.Sprintf("/__protection/%s", token.String()))
 	w.WriteHeader(200)
 }
