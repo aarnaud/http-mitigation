@@ -17,8 +17,8 @@ Flags:
       --redis-addr string       Redis Server Address (default "127.0.0.1:6379")
       --redis-db int            Redis DB
       --redis-password string   Redis Password
-      --threshold1 int          Threshold per domain per minute (mitigation redirect 307) (default 10000)
-      --threshold2 int          Threshold per domain per minute (mitigation redirect javascript) (default 50000)
+      --threshold1 int          Threshold per domain per second (mitigation redirect 307) (default 10000)
+      --threshold2 int          Threshold per domain per second (mitigation redirect javascript) (default 50000)
   -v, --verbose                 Enable verbose
 ````
 
@@ -46,6 +46,7 @@ server {
         proxy_pass_request_body off;
         proxy_set_header        Content-Length "";
         proxy_set_header        X-Original-URI $request_uri;
+        proxy_set_header        X-Original-Query $query_string;
         proxy_set_header        X-Original-Host $host;
     }
     ############################################################
