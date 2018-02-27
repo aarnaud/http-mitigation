@@ -49,10 +49,10 @@ func init() {
 	flags.Int("redis-db", 0, "Redis DB")
 	viper.BindPFlag("redis_db", flags.Lookup("redis-db"))
 
-	flags.Int("threshold1", 10000, "Threshold per domain per minute (mitigation redirect 307)")
+	flags.Int("threshold1", 150, "Threshold per domain per second (mitigation redirect 307)")
 	viper.BindPFlag("threshold1", flags.Lookup("threshold1"))
 
-	flags.Int("threshold2", 50000, "Threshold per domain per minute (mitigation redirect javascript)")
+	flags.Int("threshold2", 500, "Threshold per domain per second (mitigation redirect javascript)")
 	viper.BindPFlag("threshold2", flags.Lookup("threshold2"))
 }
 

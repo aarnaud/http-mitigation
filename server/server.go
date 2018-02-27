@@ -52,7 +52,7 @@ func defaultHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	_, _, allowed := db.Limiter.AllowMinute(domain, config.Config.Threshold1)
+	_, _, allowed := db.Limiter.Allow(domain, config.Config.Threshold1, time.Second)
 	if allowed {
 		w.WriteHeader(200)
 		return
